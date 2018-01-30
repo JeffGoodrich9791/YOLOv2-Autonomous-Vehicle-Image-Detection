@@ -5,7 +5,7 @@
 
 The goal of this project was to utilize the YOLO image detection algorithm to detect vehicles and provide bounding boxes around the vehicles as described in Redmon et al., 2016 and Redmon and Farhadi, 2016. The dataset was provided by Drive.ai which is a company building software of self-driving vehicles. The detection algorithm consisted of 80 different classes of objects, each with 5 bounding boxes computing probabilities of the object.
 
-<img src= "https://github.com/JeffGoodrich9791/YOLOv2 Autonomous Vehicle Image Detection/blob/master/Bounding_Box_Output.png" />
+<img src= "https://github.com/JeffGoodrich9791/YOLOv2 Autonomous-Vehicle-Image-Detection/blob/master/Bounding_Box_Output.png" />
 
 ### Model
 
