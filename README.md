@@ -9,13 +9,14 @@ The goal of this project was to utilize the YOLO image detection algorithm to de
 
 ### Model
 
-Template code is provided in the `YOLO_Autonomous_Driving_Image_Detection.ipynb` notebook file. The layers of the network were constructed using Python 3 and Keras backend in an iPyton Notebook. The identity block was first constructed with 3 components of the main path then adding a shortcut value to pass through a ReLU activation. The first two components consists of Conv2D, BatchNorm, and ReLU activation while the third component has only Conv2D and BatchNorm, with the ReLU activation included in the shortcut path component. 
+Template code is provided in the `YOLO_Autonomous_Driving_Image_Detection.ipynb` notebook file. The layers of the network were constructed using Python 3 and Keras backend in an iPyton Notebook. The input is a batch of images of shape 608px X 608px X 3 (rgb) which is run through a Deep Convolutional Neural Network (D-CNN) with a reduction factor of 32. The output is a list of bounding boxes with a shape of 19 X 19 X 425, where 425 is the flattening of 85 classes with 5 anchor boxes each.  
 
-<img src= "https://github.com/JeffGoodrich9791/ResNet_50_Layer/blob/master/Identity Block.png" />
+
+
 
 The first three components of the convolutional block is constructed exactly as the identity block structure. The shortcut component consist of Conv2D as well as BatchNorm, then it is added to the main path and passed through a ReLU activation function. 
 
-<img src= "https://github.com/JeffGoodrich9791/ResNet_50_Layer/blob/master/Convolutional Block.png" />
+
 
 Once the identity and convolutional blocks are constructed, the ResNet architecture is compiled. The inputs are padded with 3X3 Zero Padding then run through the 50 layer ResNet consisting of 5 stages and a final fully connected (FC) layer. Stage 1 includes a convolution layer, batch normalization, ReLU Activation function, and Max Pooling. Stages 2 through 5 include the previously constructed convolutional and identity block stack. The final layer includes average pooling, flattening, fully connected layer with as softmax function of 6 classes. Details of the entire network describing the architecture, input shape, and parameters can be found in the model summary of the `ResNet_50_Layer.ipynb` notebook file. The following figure describes  the architecture of this neural network. "ID BLOCK" in the diagram stands for "Identity block," and "ID BLOCK x3" means you should stack 3 identity blocks together
 
