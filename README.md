@@ -9,11 +9,16 @@ The goal of this project was to utilize the YOLO image detection algorithm to de
 
 ### Model
 
-Template code is provided in the `YOLO_Autonomous_Driving_Image_Detection.ipynb` notebook file. The layers of the network were constructed using Python 3 and Keras backend in an iPyton Notebook. The input is a batch of images of shape 608px X 608px X 3 (rgb) which is run through a Deep Convolutional Neural Network (D-CNN) with a reduction factor of 32. The output is a list of bounding boxes with a shape of 19 X 19 X 425, where 425 is the flattening of 80 classes with 5 anchor boxes each. The first 5 varialbles in the vector includes the probability (Pc), bx, by, bh, bw, and class (c). 
+Template code is provided in the `YOLO_Autonomous_Driving_Image_Detection.ipynb` notebook file. The layers of the network were constructed using Python 3 and Keras backend in an iPyton Notebook. The input is a batch of images of shape 608px X 608px X 3 (rgb) which is run through a Deep Convolutional Neural Network (D-CNN) with a reduction factor of 32. The output is a list of bounding boxes with a shape of 19 X 19 X 425, where 425 is the flattening of 80 classes with 5 anchor boxes each. The first 5 varialbles in the vector includes the probability (Pc), bx, by, bh, bw, and the final varalbe consists of the 80 different classes (c). 
 
 <img src= "https://github.com/JeffGoodrich9791/YOLOv2_Autonomous_Vehicle_Image_Detection/blob/master/Encoding_DeepCNN.png" />
 
+For each of the 5 bounding boxes in each of the 19 X 19 cells, the elementwise product is computed to get a probability that the box contains a each of the 80 classes trained into the model. This produces a "score" for each cell as they scanned across the image. A threshold value is used to filter the scores so that only the scores above the threshold are significant. The threshold value used in the model was 0.6. 
 
+After filtering by thresholding over the classes scores, you still end up a lot of overlapping boxes. A second filter for selecting the right boxes is called non-maximum suppression (NMS). Non-maximum supression uses Intersection over Union (IoU) to select the highest probability out of the remaining bounding boxes. 
+
+
+<img src= "https://github.com/JeffGoodrich9791/YOLOv2_Autonomous_Vehicle_Image_Detection/blob/master/NM-S.png" />
 
 The first three components of the convolutional block is constructed exactly as the identity block structure. The shortcut component consist of Conv2D as well as BatchNorm, then it is added to the main path and passed through a ReLU activation function. 
 
