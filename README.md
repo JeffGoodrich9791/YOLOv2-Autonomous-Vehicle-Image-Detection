@@ -3,7 +3,7 @@
 
 ### Summary
 
-The goal of this project was to utilize the YOLO image detection algorithm to detect vehicles and provide bounding boxes around the vehicles as described in Redmon et al., 2016 and Redmon and Farhadi, 2016. The dataset was provided by Drive.ai which is a company building software of self-driving vehicles. The detection algorithm consisted of 80 different classes of objects, each with 5 bounding boxes computing probabilities of the object.
+The goal of this project was to utilize the YOLO image detection algorithm to detect vehicles and provide bounding boxes around the vehicles as described in Redmon et al., 2016 and Redmon and Farhadi, 2016. The dataset was provided by Drive.ai which is a company building software of self-driving vehicles. The detection algorithm consists of 80 different classes of objects, each with 5 bounding boxes computing probabilities of the object. For efficiency we used a model with pre-trained weights which come from the official YOLO website, and were converted using a function written by Allan Zelener (YAD2K: Yet Another Darknet 2 Keras).
 
 <img src= "https://github.com/JeffGoodrich9791/YOLOv2_Autonomous_Vehicle_Image_Detection/blob/master/Bounding_Box_Output.png" />
 
@@ -20,24 +20,45 @@ After filtering by thresholding over the classes scores, you still end up a lot 
 
 <img src= "https://github.com/JeffGoodrich9791/YOLOv2_Autonomous_Vehicle_Image_Detection/blob/master/NMS.png" />
 
-The first three components of the convolutional block is constructed exactly as the identity block structure. The shortcut component consist of Conv2D as well as BatchNorm, then it is added to the main path and passed through a ReLU activation function. 
-
-
-
-Once the identity and convolutional blocks are constructed, the ResNet architecture is compiled. The inputs are padded with 3X3 Zero Padding then run through the 50 layer ResNet consisting of 5 stages and a final fully connected (FC) layer. Stage 1 includes a convolution layer, batch normalization, ReLU Activation function, and Max Pooling. Stages 2 through 5 include the previously constructed convolutional and identity block stack. The final layer includes average pooling, flattening, fully connected layer with as softmax function of 6 classes. Details of the entire network describing the architecture, input shape, and parameters can be found in the model summary of the `ResNet_50_Layer.ipynb` notebook file. The following figure describes  the architecture of this neural network. "ID BLOCK" in the diagram stands for "Identity block," and "ID BLOCK x3" means you should stack 3 identity blocks together
-
-<img src= "https://github.com/JeffGoodrich9791/ResNet_50_Layer/blob/master/ResNet Model.png" />
+The output of yolo_model is a (m, 19, 19, 5, 85) tensor that needs to pass through non-trivial processing and conversion. The following cell does that for you.
 
 ### Run
 
-The model is then run as a model() instance in Keras with AdamOptimizer and categorical crossentropy loss funtion. 
+The output of yolo_model is a (m, 19, 19, 5, 85) tensor that needs to pass through non-trivial processing and conversion. The following cell does executes this. 
 
-> model = ResNet50(input_shape = (64, 64, 3), classes = 6)
+> yolo_outputs = yolo_head(yolo_model.output, anchors, len(class_names))
 
-> model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+The yolo_outputs produced all of the predicted boxes of yolo_model in the correct format. Now the the ouptuts need to be filtered using this command. 
 
+> scores, boxes, classes = yolo_eval(yolo_outputs, image_shape)
+
+The prediction for the new image is then run through the following code: 
+
+>  Preprocess your image
+    image, image_data = preprocess_image("images/" + image_file, model_image_size = (608, 608))
+
+    
+    out_scores, out_boxes, out_classes = sess.run([scores, boxes, classes], feed_dict = {yolo_model.input: image_data,    K.learning_phase():0})
+    ### END CODE HERE ###
+
+    # Print predictions info
+    print('Found {} boxes for {}'.format(len(out_boxes), image_file))
+    # Generate colors for drawing bounding boxes.
+    colors = generate_colors(class_names)
+    # Draw bounding boxes on the image file
+    draw_boxes(image, out_scores, out_boxes, out_classes, class_names, colors)
+    # Save the predicted bounding box on the image
+    image.save(os.path.join("out", image_file), quality=90)
+    # Display the results in the notebook
+    output_image = scipy.misc.imread(os.path.join("out", image_file))
+    imshow(output_image)
+    
+    return out_scores, out_boxes, out_classes
 
 
 ### Results
 
-The model was trained using a CPU through 2 interations and a batch size of 32. Much better accuracy could have been produced if the session was run using CUDA on a GPU, however; this was not available for training of the model at the time. The results produced with limited number of 2 epochs 
+> out_scores, out_boxes, out_classes = predict(sess, "test.jpg")
+
+<img src= "https://github.com/JeffGoodrich9791/YOLOv2_Autonomous_Vehicle_Image_Detection/blob/master/Bounding_Box_Output.png" /> 
+
